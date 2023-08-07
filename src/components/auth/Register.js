@@ -1,7 +1,37 @@
-import { Box, Button, Center, FormControl, FormErrorMessage, FormLabel, Heading, Input, Text, Stack, Checkbox, Link } from '@chakra-ui/react'
+import { 
+  Box, 
+  Button, 
+  Center, 
+  FormControl, 
+  FormErrorMessage, 
+  FormLabel, 
+  Heading, 
+  Input, 
+  Text, 
+  Stack, 
+  Checkbox, 
+  Link } from '@chakra-ui/react'
 
+import { DASHBOARD, LOGIN } from '../../lib/routers'
+import { Link as RouterLink} from 'react-router-dom'
+import { useRegister} from '../../hooks/auth'
+import { useForm } from 'react-hook-form';
+import { emailValidate, olderValidate, passwordValidate, usernameValidate } from "../../utils/form-validate";
 
-function Register() {
+export default function Register() {
+  const { register: signup, isLoading } = useRegister()
+  const { register, handleSubmit, formState: { errors }, } = useForm() 
+
+  async function handleRegister(data) {
+    signup({
+      username: data.username,
+      email: data.email,
+      password: data.password,
+      older: data.older,
+      redirectTo: DASHBOARD,
+    })
+  }
+
   return (
     <Center w="100%" h="100vh">
       <Box mx="1" maxW="md" p="9" borderWidth="1px" borderRadius="lg">
@@ -9,44 +39,83 @@ function Register() {
           Regístrate
         </Heading>
 
-          <FormControl py="2">
-            <FormLabel>Nombre de usuario</FormLabel>
-            <Input placeholder="nombre de usuario" />
-            <FormErrorMessage></FormErrorMessage>
-          </FormControl>
-          <FormControl py="2">
-            <FormLabel>Email</FormLabel>
-            <Input type='email' placeholder='usuario@email.com'/>
-            <FormErrorMessage></FormErrorMessage>
-          </FormControl>
-          <FormControl py="2">
-            <FormLabel>Contraseña</FormLabel>
-            <Input type='password' />
-            <FormErrorMessage></FormErrorMessage>
-          </FormControl>
-          <FormControl py="2">
+        <form onSubmit={handleSubmit(handleRegister)} >
+          <FormControl isInvalid={errors.username} py="2">
+              <FormLabel>Nombre de usuario</FormLabel>
+              <Input placeholder="nombre de usuario" {...register("username", usernameValidate)} />
+              <FormErrorMessage>
+                {errors.username && errors.username.message}
+              </FormErrorMessage>
+            </FormControl>
+
+            <FormControl isInvalid={errors.email} py="2">
+              <FormLabel>Email</FormLabel>
+              <Input 
+                type='email' 
+                placeholder='usuario@email.com'
+                {...register("email", emailValidate )} />
+              <FormErrorMessage>
+                {errors.email && errors.email.message}
+              </FormErrorMessage>
+            </FormControl>
+
+            <FormControl isInvalid={errors.password} py="2">
+              <FormLabel>Contraseña</FormLabel>
+              <Input 
+                type='password' 
+                placeholder='ingrese contraseña'
+                {...register("password", passwordValidate)} />
+              <FormErrorMessage>
+                {errors.password && errors.password.message}
+              </FormErrorMessage>
+            </FormControl>
+
+            <FormControl isInvalid={errors.older} py="2">
             <Stack>
-              <Checkbox colorScheme="green">
+              <Checkbox colorScheme="green" {...register("older", olderValidate)}>
                 <Text fontSize='sm'>Soy mayor de 13 años, he leído y aceptado <Link color="teal.800" fontWeight="medium" textDecor="underline" _hover={{ background: "teal.100" }}>los Términos y condiciones</Link> del sitio.</Text>
               </Checkbox>
-              <FormErrorMessage></FormErrorMessage>
+              <FormErrorMessage>
+                {errors.older && errors.older.message}
+              </FormErrorMessage>
             </Stack>
-          </FormControl>
-          <Button mt="4" type='submit' colorScheme='teal' size='md' w='full' loadingText='registrarse'>
-            Registrarse
-          </Button>
+            </FormControl>
 
-        
+            <Button 
+              mt="4"
+              type='submit'
+              colorScheme='teal'
+              size='md'
+              w='full'
+              isLoading={isLoading}
+              loadingText='registrarse'>
+              Registrarse
+            </Button>
+        </form>
         <Text fontSize="xlg" align="center" mt="6">
           Ya tienes una cuenta?{" "}
-          <Link  color="teal.800" fontWeight="medium" textDecor="underline" _hover={{ background: "teal.100" }}>
+          <Link
+            as={RouterLink}
+            to={LOGIN}
+            color="teal.800" 
+            fontWeight="medium" 
+            textDecor="underline" 
+            _hover={{ background: "teal.100" }}>
             Iniciar sesión
           </Link>{" "}
-          o inicia sesión con
+            o inicia sesión con
         </Text>
       </Box>
     </Center>
   )
 }
 
-export default Register
+
+
+
+
+
+
+
+
+        
